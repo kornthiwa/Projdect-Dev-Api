@@ -36,7 +36,7 @@ export class MedicalRecord {
   bodyTemperature?: number;
 
   // สถานะการรักษา
-  @Prop({ type: String, required: false })
+  @Prop({ type: String, required: false, default: 'successful' })
   status: string;
 
   // น้ำหนัก

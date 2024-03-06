@@ -21,6 +21,25 @@ export class QueueController {
     private readonly patientService: PatientService,
   ) {}
 
+  @Get('find')
+  async findallQueue(): Promise<Queue[]> {
+    return await this.queueService.findAll();
+  }
+
+  @Get('reset')
+  async resetQueues(): Promise<Queue[]> {
+    try {
+      const queues = await this.queueService.setAllQueuesToPending();
+      return queues;
+    } catch (error) {
+      console.error('Error occurred while resetting queues:', error);
+      throw new HttpException(
+        'เกิดข้อผิดพลาดในการตั้งค่าคิวใหม่',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('next/:doctorId')
   async callNextQueue(
     @Param('doctorId') doctorId: string,
@@ -28,11 +47,16 @@ export class QueueController {
     return await this.queueService.callNextQueue(doctorId);
   }
 
-  @Get(':queueNumber')
+  @Get(':doctorId')
   async recallQueue(
-    @Param('queueNumber') queueNumber: number,
+    @Param('doctorId') doctorId: string,
   ): Promise<Queue | null> {
-    return await this.queueService.reCallQueue(queueNumber);
+    return await this.queueService.reCallQueue(doctorId);
+  }
+
+  @Get('find/:doctorId')
+  async findQueue(@Param('doctorId') doctorId: string): Promise<Queue[]> {
+    return await this.queueService.findQueue(doctorId);
   }
 
   @Get()

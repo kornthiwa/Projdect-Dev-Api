@@ -24,15 +24,11 @@ export class Appointment {
   doctor: Doctor;
 
   // วันและเวลาที่นัดหมาย
-  @Prop({ type: Date, required: true })
-  appointmentDateTime: Date;
-
-  // หมายเลขคิวที่เกี่ยวข้อง
-  @Prop({ type: Number, required: true })
-  queueNumber: number;
+  @Prop({ type: Date, required: false })
+  appointmentDate: Date;
 
   // สถานะของการนัดหมาย (ยืนยัน, ยกเลิก, การแจ้งเตือนเพิ่มเติม)
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false, default: 'pending' })
   status: string;
 }
 

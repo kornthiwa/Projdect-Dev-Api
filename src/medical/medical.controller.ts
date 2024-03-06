@@ -45,16 +45,16 @@ export class MedicalController {
     return await this.medicalService.findAll();
   }
 
-  @Get('/search')
-  async findOne(
-    @Query('patient') patientID?: string,
-    @Query('doctor') doctorID?: string,
-  ) {
-    return await this.medicalService.findOne(patientID, doctorID);
-  }
+  // @Get('/search')
+  // async findOne(
+  //   @Query('patient') patientID?: string,
+  //   @Query('doctor') doctorID?: string,
+  // ) {
+  //   return await this.medicalService.findOne(patientID, doctorID);
+  // }
 
-  @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.medicalService.remove(id);
-  }
+  // @Delete(':id')
+  // async remove(@Param('id') id: string) {
+  //   return await this.medicalService.remove(id);
+  // }
 }

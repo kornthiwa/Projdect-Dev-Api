@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
-import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import {
+  Appointment,
+  AppointmentDocument,
+} from './entities/appointment.entity';
 
 @Injectable()
 export class AppointmentService {
-  create(createAppointmentDto: CreateAppointmentDto) {
-    return 'This action adds a new appointment';
+  constructor(
+    @InjectModel(Appointment.name)
+    private appointmentModel: Model<AppointmentDocument>,
+  ) {}
+
+  async create(
+    createAppointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
+    const createdAppointment = new this.appointmentModel(createAppointmentDto);
+    return createdAppointment.save();
   }
 
-  findAll() {
-    return `This action returns all appointment`;
+  async findAll(): Promise<Appointment[]> {
+    return this.appointmentModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
+  async findOne(id: string): Promise<Appointment> {
+    return this.appointmentModel.findById(id).exec();
   }
 
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} appointment`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+  async update(
+    id: string,
+    updateAppointmentDto: CreateAppointmentDto,
+  ): Promise<Appointment> {
+    return this.appointmentModel
+      .findByIdAndUpdate(id, updateAppointmentDto, { new: true })
+      .exec();
   }
 }

@@ -37,57 +37,34 @@ export class QueueService {
     const newQueue = new this.queueModel({
       ...createQueueDto,
       queueNumber,
+      status: 'pending',
       queuedAt: new Date(),
     });
 
     // บันทึกคิวใหม่
     return await newQueue.save();
   }
+  async findQueue(doctorId: string): Promise<Queue[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
 
-  // async create(createQueueDto: CreateQueueDto): Promise<Queue> {
-  //   // Find the last queue
-  //   const lastQueue = await this.findLastQueue();
-  //   // Check if it's a new day
-  //   const today = new Date().getDate();
-  //   const lastQueueDay = lastQueue ? lastQueue.queuedAt.getDate() : null;
-
-  //   // Find patient and populate data
-  //   const patient = await this.patientModel
-  //     .findById(createQueueDto.patient)
-  //     .populate('_id');
-  //   console.log(patient);
-
-  //   // Initialize the queue number
-  //   let queueNumber = 1;
-
-  //   if (lastQueueDay !== today) {
-  //     // If it's a new day, reset the queue number
-  //     queueNumber = 1;
-  //   } else {
-  //     // If it's the same day, increment the queue number
-  //     queueNumber = lastQueue.queueNumber + 1;
-  //   }
-
-  //   // Create a new queue
-  //   const newQueue = new this.queueModel({
-  //     ...createQueueDto,
-  //     queueNumber,
-  //     queuedAt: new Date(),
-  //   });
-
-  //   // Save the new queue
-  //   return await newQueue.save();
-  // }
-
-  async findLastQueue(doctorId: string): Promise<Queue | null> {
     return await this.queueModel
-      .findOne({ doctor: doctorId })
-      .sort({ queuedAt: -1 })
+      .find({
+        doctor: doctorId,
+        queuedAt: { $gte: today },
+        status: 'pending',
+      }) // ค้นหาคิวของวันนี้และสถานะเป็น 'pending'
+      // .sort({ queuedAt: -1 }) // เรียงตามเวลาที่คิวถูกจัดเก็บ
       .exec();
   }
 
   async findAll(): Promise<Queue[]> {
-    const queues = await this.queueModel.find().populate('patient');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
+    const queues = await this.queueModel.find({
+      queuedAt: { $gte: today },
+      status: 'pending',
+    });
     return queues;
   }
 
@@ -99,7 +76,7 @@ export class QueueService {
       .findOne({
         doctor: doctorId,
         queuedAt: { $gte: today },
-        status: { $ne: 'Finished' },
+        status: { $ne: 'finished' },
       }) // แก้ไขเพื่อตรวจสอบว่าสถานะไม่ใช่ 'Finished'
       .sort({ queueNumber: 1 })
       .exec();
@@ -115,93 +92,91 @@ export class QueueService {
 
   async callNextQueue(doctorId: string): Promise<Queue | null> {
     const currentQueueNumber = await this.getCurrentQueueNumber(doctorId);
-
+    console.log(currentQueueNumber);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
     if (currentQueueNumber === 0) {
-      return null; // ไม่มีคิวใดๆ ที่เท่าไหร่แล้วในวันนี้สำหรับหมอที่กำหนด
+      const nextQueue = await this.queueModel
+        .findOne({
+          doctor: doctorId,
+          status: 'finished',
+          queuedAt: { $gte: today },
+        })
+        .sort({ queueNumber: -1 }) // เรียงลำดับ queueNumber ให้มากไปน้อย
+        .limit(1); // เลือกเฉพาะคิวแรกที่พบ
+      return nextQueue;
     }
 
-    const nextQueue = await this.queueModel
-      .findOne({
-        doctor: doctorId,
-        queueNumber: currentQueueNumber,
-      })
-      .populate('patient'); // Populate ข้อมูลคนไข้
-
-    if (!nextQueue) {
-      return null; // ไม่มีคิวถัดไปสำหรับหมอที่กำหนด
-    }
+    const nextQueue = await this.queueModel.findOne({
+      doctor: doctorId,
+      queueNumber: currentQueueNumber,
+      queuedAt: { $gte: today },
+    });
+    const nextDataQueue = await this.queueModel.findOne({
+      doctor: doctorId,
+      queueNumber: currentQueueNumber + 1,
+      queuedAt: { $gte: today },
+    });
+    // .populate('patient'); // Populate ข้อมูลคนไข้
 
     const currentQueue = await this.queueModel.findOne({
       doctor: doctorId,
       queueNumber: currentQueueNumber,
+      queuedAt: { $gte: today },
     });
 
     if (currentQueue) {
-      currentQueue.status = 'Finished';
+      currentQueue.status = 'finished';
       await currentQueue.save(); // บันทึกการอัพเดทสถานะคิวปัจจุบัน
     }
 
-    return nextQueue;
+    if (!nextDataQueue) {
+      return nextQueue;
+    }
+    return nextDataQueue;
   }
 
-  // async getCurrentQueueNumber(): Promise<number> {
-  //   const today = new Date();
-  //   today.setHours(0, 0, 0, 0); // เซ็ตเวลาให้อยู่ที่เริ่มของวันนี้
-
-  //   const currentQueue = await this.queueModel
-  //     .findOne({ queuedAt: { $gte: today }, status: { $ne: 'Finished' } }) // แก้ไขเพื่อตรวจสอบว่าสถานะไม่ใช่ 'Finished'
-  //     .sort({ queueNumber: 1 })
-  //     .exec();
-
-  //   console.log('Current Queue:', currentQueue); // แสดงคิวที่พบในวันนี้
-
-  //   if (currentQueue) {
-  //     return currentQueue.queueNumber;
-  //   } else {
-  //     return 0; // ถ้าไม่มีคิวใดๆ ที่เท่าไหร่แล้วในวันนี้ หรือคิวที่พบมีสถานะเป็น 'Finished'
-  //   }
-  // }
-
-  // async callNextQueue(): Promise<Queue | null> {
-  //   const currentQueueNumber = await this.getCurrentQueueNumber();
-
-  //   if (currentQueueNumber === 0) {
-  //     return null; // ไม่มีคิวใดๆ ที่เท่าไหร่แล้วในวันนี้
-  //   }
-
-  //   const nextQueue = await this.queueModel
-  //     .findOne({
-  //       queueNumber: currentQueueNumber,
-  //     })
-  //     .populate('patient'); // Populate ข้อมูลคนไข้
-
-  //   if (!nextQueue) {
-  //     return null; // ไม่มีคิวถัดไป
-  //   }
-
-  //   const currentQueue = await this.queueModel.findOne({
-  //     queueNumber: currentQueueNumber,
-  //   });
-
-  //   if (currentQueue) {
-  //     currentQueue.status = 'Finished';
-  //     await currentQueue.save(); // บันทึกการอัพเดทสถานะคิวปัจจุบัน
-  //   }
-
-  //   return nextQueue;
-  // }
-
-  async reCallQueue(queueNumber: number): Promise<Queue | null> {
+  async reCallQueue(doctorId: string): Promise<Queue | null> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
     const queue = await this.queueModel
-      .findOne({ queueNumber })
-      .populate('patient')
+      .findOne({
+        doctor: doctorId,
+        queuedAt: { $gte: today },
+        status: 'pending',
+      }) // Exclude queues with 'finished' status
       .exec();
-    console.log(queue);
 
     if (!queue) {
-      return null; // ไม่พบคิวที่ต้องการเรียกซ้ำ
+      const nextQueue = await this.queueModel
+        .findOne({
+          doctor: doctorId,
+          status: 'finished',
+        })
+        .sort({ queueNumber: -1 }) // เรียงลำดับ queueNumber ให้มากไปน้อย
+        .limit(1); // เลือกเฉพาะคิวแรกที่พบ
+      return nextQueue;
     }
 
     return queue;
+  }
+
+  async setAllQueuesToPending(): Promise<Queue[]> {
+    try {
+      // ค้นหาทุกคิวและอัปเดตสถานะเป็น 'pending'
+      const queues = await this.queueModel.find({}); // ค้นหาทุกคิว
+      for (const queue of queues) {
+        queue.status = 'pending'; // เปลี่ยนสถานะเป็น 'pending'
+        await queue.save(); // บันทึกการเปลี่ยนแปลง
+      }
+      return queues;
+    } catch (error) {
+      // หากเกิดข้อผิดพลาดในการดำเนินการกับฐานข้อมูล
+      console.error(
+        'Error occurred while setting all queues to pending:',
+        error,
+      );
+      throw error;
+    }
   }
 }
