@@ -46,6 +46,12 @@ export class PatientService {
     return await this.patientModel.findById(id).exec();
   }
 
+  async findOneByName(name: string): Promise<Patient[]> {
+    // Find doctors by name (use regex for flexibility)
+    return await this.patientModel.find({
+      name: { $regex: new RegExp(`${name}.*`, 'i') },
+    });
+  }
   async update(
     id: string,
     updatePatientDto: UpdatePatientDto,

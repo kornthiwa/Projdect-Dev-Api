@@ -8,10 +8,12 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { PatientService } from './patient.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { Patient } from './entities/patient.entity';
 
 @Controller('patient')
 export class PatientController {
@@ -43,14 +45,18 @@ export class PatientController {
     }
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id: string) {
+  @Get('/search')
+  async searchDoctorsByName(@Query('name') name?: string): Promise<Patient[]> {
     try {
-      return await this.patientService.findOne(id);
+      if (name) {
+        return await this.patientService.findOneByName(name);
+      } else {
+        return await this.patientService.findAll();
+      }
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        { message: 'Failed to retrieve patient' },
+        { message: 'Failed to search doctors by name' },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
