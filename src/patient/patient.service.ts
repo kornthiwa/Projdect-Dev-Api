@@ -32,6 +32,8 @@ export class PatientService {
   }
 
   async findAll(): Promise<any[]> {
+    console.log('findAll');
+
     const patients = await this.patientModel
       .find()
       .sort({ createdAt: 1 })

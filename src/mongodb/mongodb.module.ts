@@ -9,7 +9,8 @@ import { MongooseModule } from '@nestjs/mongoose';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      process.env.CYCLIC_DB || 'mongodb://localhost:27017',
+      process.env.CYCLIC_DB ||
+        'mongodb+srv://mrkornthiwa:Kornthiwa@cluster0.bbkm0eg.mongodb.net/Product',
     ),
   ],
 })
