@@ -21,4 +21,10 @@ export class AppointmentController {
 
     return this.appointmentService.create(createAppointmentDto);
   }
+  @Get()
+  all(@Body() createAppointmentDto: CreateAppointmentDto) {
+    console.log(createAppointmentDto);
+
+    return this.appointmentService.findAll();
+  }
 }

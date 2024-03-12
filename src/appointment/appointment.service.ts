@@ -22,7 +22,11 @@ export class AppointmentService {
   }
 
   async findAll(): Promise<Appointment[]> {
-    return this.appointmentModel.find().exec();
+    return this.appointmentModel
+      .find()
+      .populate('patient')
+      .populate('doctor')
+      .exec();
   }
 
   async findOne(id: string): Promise<Appointment> {

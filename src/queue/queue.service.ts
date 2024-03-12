@@ -63,12 +63,12 @@ export class QueueService {
   async findAll(): Promise<Queue[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
+
     const queues = await this.queueModel
-      .find({
-        queuedAt: { $gte: today },
-        status: 'pending',
-      })
-      .populate('patient'); // Populate ข้อมูลคนไข้
+      .find({ queuedAt: { $gte: today } })
+      .populate('patient')
+      .populate('doctor');
+
     return queues;
   }
 
@@ -205,6 +205,7 @@ export class QueueService {
       if (!queue) {
         throw new Error('Queue not found');
       }
+      console.log(queue);
 
       // อัปเดตสถานะของคิว
       queue.status = 'isDiagnosing';
