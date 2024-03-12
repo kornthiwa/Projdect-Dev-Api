@@ -90,4 +90,22 @@ export class QueueController {
       );
     }
   }
+  @Post('status')
+  async updateQueueStatus(
+    @Body() createQueueDto: CreateQueueDto,
+  ): Promise<Queue> {
+    try {
+      const queue = await this.queueService.updateQueueStatus(
+        createQueueDto.patient,
+      );
+
+      return queue;
+    } catch (error) {
+      console.error('Error enqueuing queue:', error);
+      throw new HttpException(
+        { message: 'Failed to retrieve queue' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

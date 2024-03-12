@@ -19,8 +19,6 @@ export class PatientService {
       citizenid: createPatientDto.citizenid,
     });
 
-    console.log('test', existingPatient);
-
     // ถ้ามีผู้ป่วยที่มีชื่อเหมือนกันแล้ว ให้โยนข้อผิดพลาด
     if (existingPatient) {
       throw new Error('Patient with the same citizenid already exists');
@@ -48,12 +46,16 @@ export class PatientService {
     return await this.patientModel.findById(id).exec();
   }
 
-  async findOneByName(name: string): Promise<Patient[]> {
-    // Find doctors by name (use regex for flexibility)
+  async findOneByName(findname: string): Promise<Patient[]> {
+    // Find patients by name or lname (use regex for flexibility)
     return await this.patientModel.find({
-      name: { $regex: new RegExp(`${name}.*`, 'i') },
+      $or: [
+        { name: { $regex: new RegExp(`${findname}.*`, 'i') } },
+        { lastName: { $regex: new RegExp(`${findname}.*`, 'i') } },
+      ],
     });
   }
+
   async update(
     id: string,
     updatePatientDto: UpdatePatientDto,

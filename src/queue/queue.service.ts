@@ -143,7 +143,7 @@ export class QueueService {
       .findOne({
         doctor: doctorId,
         queuedAt: { $gte: today },
-        status: 'pending',
+        status: { $in: ['pending', 'isDiagnosing'] },
       }) // Exclude queues with 'finished' status
       .exec();
 
@@ -176,6 +176,29 @@ export class QueueService {
         'Error occurred while setting all queues to pending:',
         error,
       );
+      throw error;
+    }
+  }
+
+  async updateQueueStatus(queueId: string): Promise<Queue | null> {
+    try {
+      // ค้นหาคิวที่ต้องการอัปเดต
+      const queue = await this.queueModel.findOne({ patient: queueId });
+
+      if (!queue) {
+        throw new Error('Queue not found');
+      }
+
+      // อัปเดตสถานะของคิว
+      queue.status = 'isDiagnosing';
+
+      // บันทึกการเปลี่ยนแปลง
+      await queue.save();
+
+      return queue;
+    } catch (error) {
+      // หากเกิดข้อผิดพลาดในการอัปเดตสถานะคิว
+      console.error('Error occurred while updating queue status:', error);
       throw error;
     }
   }
