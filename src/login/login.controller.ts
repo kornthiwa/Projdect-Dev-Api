@@ -39,13 +39,15 @@ export class LoginController {
 
   @Post('register')
   async register(@Body() createLoginDto: CreateLoginDto) {
+    console.log(createLoginDto);
+
     try {
       const existingLogin = await this.loginService.findByUsername(
         createLoginDto.username,
       );
       if (existingLogin) {
         throw new HttpException(
-          { message: 'Username already exists' },
+          { message: 'ชื่อผู้ใช้นี้มีอยู่แล้ว' },
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -56,7 +58,7 @@ export class LoginController {
     } catch (error) {
       console.error(error);
       throw new HttpException(
-        { message: 'Failed to create account' },
+        { message: 'ไม่สามารถสร้างบัญชีได้' },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

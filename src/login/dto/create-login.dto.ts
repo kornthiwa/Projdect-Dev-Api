@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsBoolean,
 } from 'class-validator';
-import { Department, UserRole } from '../entities/login.entity';
+import { Department } from '../entities/login.entity';
 
 export class CreateLoginDto {
   @IsString()
@@ -26,8 +26,9 @@ export class CreateLoginDto {
   @IsNotEmpty()
   readonly lname: string;
 
-  @IsEnum(UserRole)
-  readonly role: UserRole;
+  @IsString()
+  @IsNotEmpty()
+  readonly role: string;
 
   @IsEnum(Department)
   readonly department: Department;

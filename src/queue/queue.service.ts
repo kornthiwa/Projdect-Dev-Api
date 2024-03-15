@@ -165,6 +165,7 @@ export class QueueService {
         .findOne({
           doctor: doctorId,
           status: 'finished',
+          queuedAt: { $gte: today },
         })
         .sort({ queueNumber: -1 }) // เรียงลำดับ queueNumber ให้มากไปน้อย
         .limit(1)

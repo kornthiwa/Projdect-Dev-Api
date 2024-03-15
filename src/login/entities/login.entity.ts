@@ -1,12 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export enum UserRole {
-  ADMIN = 'admin',
-  NURSE = 'nurse',
-  DOCTOR = 'doctor',
-}
-
 export enum Department {
   CARDIOLOGY = 'CARDIOLOGY', // อายุรกรรมโรคหัวใจ
   ONCOLOGY = 'ONCOLOGY', // อายุรกรรมโรคมะเร็ง
@@ -36,8 +30,8 @@ export class Login {
   @Prop({ type: Boolean, required: false, default: true })
   rememberMe?: boolean;
 
-  @Prop({ type: String, required: true, enum: UserRole })
-  role: UserRole;
+  @Prop({ type: String, required: true })
+  role: string;
 
   @Prop({ type: String, required: true, enum: Department })
   department: Department;

@@ -12,7 +12,6 @@ export class LoginService {
   ) {}
 
   async create(createLoginDto: CreateLoginDto): Promise<LoginDocument> {
-    console.log(createLoginDto);
     const hashedPassword = await bcrypt.hash(createLoginDto.password, 10);
     const login = new this.loginModel(createLoginDto);
     login.password = hashedPassword;
