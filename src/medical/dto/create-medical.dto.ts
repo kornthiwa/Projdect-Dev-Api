@@ -51,4 +51,9 @@ export class CreateMedicalDto {
   @IsOptional()
   @IsString()
   bloodPressure?: string;
+
+  // การสั่งยา
+  @IsString()
+  @IsOptional()
+  readonly prescription?: string;
 }

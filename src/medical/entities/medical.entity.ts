@@ -50,6 +50,10 @@ export class MedicalRecord {
   // ความดันโลหิต
   @Prop({ type: String })
   bloodPressure?: string;
+
+  // การสั่งยา
+  @Prop({ type: String, required: false })
+  prescription: string;
 }
 
 export const MedicalRecordSchema = SchemaFactory.createForClass(MedicalRecord);

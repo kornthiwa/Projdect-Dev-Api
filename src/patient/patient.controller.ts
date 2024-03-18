@@ -47,8 +47,6 @@ export class PatientController {
 
   @Get('/search')
   async searchDoctorsByName(@Query('name') name?: string): Promise<Patient[]> {
-    console.log(name);
-
     try {
       if (name) {
         return await this.patientService.findOneByName(name);

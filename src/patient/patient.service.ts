@@ -13,7 +13,6 @@ export class PatientService {
 
   async create(createPatientDto: CreatePatientDto): Promise<Patient> {
     // ตรวจสอบว่ามีผู้ป่วยที่มีชื่อเหมือนกันหรือไม่
-    console.log(createPatientDto.citizenid);
 
     const existingPatient = await this.patientModel.findOne({
       citizenid: createPatientDto.citizenid,
@@ -30,8 +29,6 @@ export class PatientService {
   }
 
   async findAll(): Promise<any[]> {
-    console.log('findAll');
-
     const patients = await this.patientModel
       .find()
       .sort({ createdAt: 1 })

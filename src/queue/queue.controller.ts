@@ -26,19 +26,19 @@ export class QueueController {
     return await this.queueService.findAll();
   }
 
-  @Get('reset')
-  async resetQueues(): Promise<Queue[]> {
-    try {
-      const queues = await this.queueService.setAllQueuesToPending();
-      return queues;
-    } catch (error) {
-      console.error('Error occurred while resetting queues:', error);
-      throw new HttpException(
-        'เกิดข้อผิดพลาดในการตั้งค่าคิวใหม่',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+  // @Get('reset')
+  // async resetQueues(): Promise<Queue[]> {
+  //   try {
+  //     const queues = await this.queueService.setAllQueuesToPending();
+  //     return queues;
+  //   } catch (error) {
+  //     console.error('Error occurred while resetting queues:', error);
+  //     throw new HttpException(
+  //       'เกิดข้อผิดพลาดในการตั้งค่าคิวใหม่',
+  //       HttpStatus.INTERNAL_SERVER_ERROR,
+  //     );
+  //   }
+  // }
 
   @Get('next/:doctorId')
   async callNextQueue(
@@ -91,13 +91,9 @@ export class QueueController {
     }
   }
   @Post('status')
-  async updateQueueStatus(
-    @Body() createQueueDto: CreateQueueDto,
-  ): Promise<Queue> {
+  async updateQueueStatus(@Body() createQueueDto: string): Promise<Queue> {
     try {
-      const queue = await this.queueService.updateQueueStatus(
-        createQueueDto.patient,
-      );
+      const queue = await this.queueService.updateQueueStatus(createQueueDto);
 
       return queue;
     } catch (error) {

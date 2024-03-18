@@ -85,8 +85,6 @@ export class QueueService {
       .sort({ queueNumber: 1 })
       .exec();
 
-    console.log('Current Queue:', currentQueue); // แสดงคิวที่พบในวันนี้
-
     if (currentQueue) {
       return currentQueue.queueNumber;
     } else {
@@ -96,7 +94,6 @@ export class QueueService {
 
   async callNextQueue(doctorId: string): Promise<Queue | null> {
     const currentQueueNumber = await this.getCurrentQueueNumber(doctorId);
-    console.log(currentQueueNumber);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // ตั้งเวลาให้เป็นเริ่มต้นของวันนี้
     if (currentQueueNumber === 0) {
@@ -177,48 +174,67 @@ export class QueueService {
     return queue;
   }
 
-  async setAllQueuesToPending(): Promise<Queue[]> {
+  // async setAllQueuesToPending(): Promise<Queue[]> {
+  //   try {
+  //     // ค้นหาทุกคิวและอัปเดตสถานะเป็น 'pending'
+  //     const queues = await this.queueModel.find({}).populate('patient'); // Populate ข้อมูลคนไข้
+  //     // ค้นหาทุกคิว
+  //     for (const queue of queues) {
+  //       queue.status = 'pending'; // เปลี่ยนสถานะเป็น 'pending'
+  //       await queue.save(); // บันทึกการเปลี่ยนแปลง
+  //     }
+  //     return queues;
+  //   } catch (error) {
+  //     // หากเกิดข้อผิดพลาดในการดำเนินการกับฐานข้อมูล
+  //     console.error(
+  //       'Error occurred while setting all queues to pending:',
+  //       error,
+  //     );
+  //     throw error;
+  //   }
+  // }
+
+  async updateQueueStatus(queueId: any): Promise<Queue | null> {
     try {
-      // ค้นหาทุกคิวและอัปเดตสถานะเป็น 'pending'
-      const queues = await this.queueModel.find({}).populate('patient'); // Populate ข้อมูลคนไข้
-      // ค้นหาทุกคิว
-      for (const queue of queues) {
-        queue.status = 'pending'; // เปลี่ยนสถานะเป็น 'pending'
-        await queue.save(); // บันทึกการเปลี่ยนแปลง
-      }
-      return queues;
+      // const queue = await this.queueModel.findOne({ patient: queueId });
+      console.log(queueId._id);
+
+      return await this.queueModel
+        .findByIdAndUpdate(
+          queueId._id,
+          { status: 'isDiagnosing' }, // ข้อมูลที่ต้องการอัปเดต
+          { new: true }, // ตัวเลือกให้คืนค่าเอกสารที่ถูกอัปเดต
+        )
+        .exec();
     } catch (error) {
-      // หากเกิดข้อผิดพลาดในการดำเนินการกับฐานข้อมูล
-      console.error(
-        'Error occurred while setting all queues to pending:',
-        error,
-      );
-      throw error;
-    }
-  }
-
-  async updateQueueStatus(queueId: string): Promise<Queue | null> {
-    try {
-      // ค้นหาคิวที่ต้องการอัปเดต
-      const queue = await this.queueModel
-        .findOne({ patient: queueId })
-        .populate('patient'); // Populate ข้อมูลคนไข้
-      if (!queue) {
-        throw new Error('Queue not found');
-      }
-      console.log(queue);
-
-      // อัปเดตสถานะของคิว
-      queue.status = 'isDiagnosing';
-
-      // บันทึกการเปลี่ยนแปลง
-      await queue.save();
-
-      return queue;
-    } catch (error) {
-      // หากเกิดข้อผิดพลาดในการอัปเดตสถานะคิว
       console.error('Error occurred while updating queue status:', error);
       throw error;
     }
   }
+
+  // async updateQueueStatus(queueId: string): Promise<Queue | null> {
+  //   try {
+  //     // Find the queue to update
+  //     const queue = await this.queueModel
+  //       .findOne({ patient: queueId })
+  //       .populate('patient')
+  //       .exec();
+
+  //     if (!queue) {
+  //       throw new Error('Queue not found');
+  //     }
+
+  //     // Update the queue status
+  //     queue.status = 'isDiagnosing';
+
+  //     // Save the changes
+  //     const updatedQueue = await queue.save();
+
+  //     return updatedQueue;
+  //   } catch (error) {
+  //     // Handle errors
+  //     console.error('Error occurred while updating queue status:', error);
+  //     throw error;
+  //   }
+  // }
 }
