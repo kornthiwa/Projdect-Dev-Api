@@ -8,6 +8,7 @@ import {
   Query,
   HttpException,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import { MedicalService } from './medical.service';
 import { CreateMedicalDto } from './dto/create-medical.dto';
@@ -43,6 +44,21 @@ export class MedicalController {
     return await this.medicalService.findAll();
   }
 
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updatePatientDto: CreateMedicalDto,
+  ) {
+    try {
+      return await this.medicalService.update(id, updatePatientDto);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        { message: 'Failed to update patient' },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
   // @Get('/search')
   // async findOne(
   //   @Query('patient') patientID?: string,

@@ -45,6 +45,20 @@ export class PatientController {
     }
   }
 
+  @Get('sample-data')
+  async countQueuePerDay(): Promise<{ [key: string]: number }> {
+    try {
+      const countPerDay = await this.patientService.countByGender();
+      return countPerDay;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'เกิดข้อผิดพลาดในการนับจำนวนคิวต่อวัน',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('/search')
   async searchDoctorsByName(@Query('name') name?: string): Promise<Patient[]> {
     try {

@@ -42,4 +42,13 @@ export class MedicalService {
   async remove(id: string): Promise<void> {
     await this.medicalRecordModel.findByIdAndDelete(id);
   }
+
+  async update(
+    id: string,
+    updatePatientDto: CreateMedicalDto,
+  ): Promise<MedicalRecordDocument | null> {
+    return await this.medicalRecordModel
+      .findByIdAndUpdate(id, updatePatientDto, { new: true })
+      .exec();
+  }
 }

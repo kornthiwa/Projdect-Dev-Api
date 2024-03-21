@@ -65,4 +65,20 @@ export class PatientService {
   async remove(id: string): Promise<Patient | null> {
     return await this.patientModel.findByIdAndDelete(id).exec();
   }
+
+  async countByGender(): Promise<{ [key: string]: number }> {
+    const queues = await this.patientModel.find();
+    const countPerDay: { [key: string]: number } = {};
+
+    queues.forEach((queue) => {
+      const date = queue.nametitle.split('T')[0]; // แก้ไขจาก createdAt เป็น queuedAt
+      if (countPerDay[date]) {
+        countPerDay[date]++;
+      } else {
+        countPerDay[date] = 1;
+      }
+    });
+
+    return countPerDay;
+  }
 }

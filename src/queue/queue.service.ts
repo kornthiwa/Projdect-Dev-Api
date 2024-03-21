@@ -237,4 +237,19 @@ export class QueueService {
   //     throw error;
   //   }
   // }
+  async countQueuePerDay(): Promise<{ [key: string]: number }> {
+    const queues = await this.queueModel.find();
+    const countPerDay: { [key: string]: number } = {};
+
+    queues.forEach((queue) => {
+      const date = queue.queuedAt.toISOString().split('T')[0]; // แก้ไขจาก createdAt เป็น queuedAt
+      if (countPerDay[date]) {
+        countPerDay[date]++;
+      } else {
+        countPerDay[date] = 1;
+      }
+    });
+
+    return countPerDay;
+  }
 }

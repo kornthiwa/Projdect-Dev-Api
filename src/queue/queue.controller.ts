@@ -21,6 +21,20 @@ export class QueueController {
     private readonly patientService: PatientService,
   ) {}
 
+  @Get('count-per-day')
+  async countQueuePerDay(): Promise<{ [key: string]: number }> {
+    try {
+      const countPerDay = await this.queueService.countQueuePerDay();
+      return countPerDay;
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(
+        'เกิดข้อผิดพลาดในการนับจำนวนคิวต่อวัน',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get('find')
   async findallQueue(): Promise<Queue[]> {
     return await this.queueService.findAll();
