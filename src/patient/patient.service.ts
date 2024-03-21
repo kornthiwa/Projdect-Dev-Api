@@ -71,7 +71,7 @@ export class PatientService {
     const countPerDay: { [key: string]: number } = {};
 
     queues.forEach((queue) => {
-      const date = queue.nametitle.split('T')[0]; // แก้ไขจาก createdAt เป็น queuedAt
+      const date = queue.gender.split('T')[0]; // แก้ไขจาก createdAt เป็น queuedAt
       if (countPerDay[date]) {
         countPerDay[date]++;
       } else {
