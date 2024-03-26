@@ -8,7 +8,8 @@ export class Doctor {
   // ชื่อของแพทย์
   @Prop({ type: String, required: true })
   name: string;
-
+  @Prop({ type: String, required: true })
+  lastName: string;
   // ตำแหน่งของแพทย์
   @Prop({ type: String, required: true })
   position: string;

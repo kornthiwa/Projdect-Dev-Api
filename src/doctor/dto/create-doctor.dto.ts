@@ -6,6 +6,9 @@ export class CreateDoctorDto {
   @IsNotEmpty()
   readonly name: string;
 
+  @IsString()
+  @IsNotEmpty()
+  readonly lastName: string;
   // ตำแหน่งของแพทย์
   @IsString()
   @IsNotEmpty()
