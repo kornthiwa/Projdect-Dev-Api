@@ -40,20 +40,6 @@ export class QueueController {
     return await this.queueService.findAll();
   }
 
-  // @Get('reset')
-  // async resetQueues(): Promise<Queue[]> {
-  //   try {
-  //     const queues = await this.queueService.setAllQueuesToPending();
-  //     return queues;
-  //   } catch (error) {
-  //     console.error('Error occurred while resetting queues:', error);
-  //     throw new HttpException(
-  //       'เกิดข้อผิดพลาดในการตั้งค่าคิวใหม่',
-  //       HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
-
   @Get('next/:doctorId')
   async callNextQueue(
     @Param('doctorId') doctorId: string,

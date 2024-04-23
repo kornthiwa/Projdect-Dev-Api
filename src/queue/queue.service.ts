@@ -174,26 +174,6 @@ export class QueueService {
     return queue;
   }
 
-  // async setAllQueuesToPending(): Promise<Queue[]> {
-  //   try {
-  //     // ค้นหาทุกคิวและอัปเดตสถานะเป็น 'pending'
-  //     const queues = await this.queueModel.find({}).populate('patient'); // Populate ข้อมูลคนไข้
-  //     // ค้นหาทุกคิว
-  //     for (const queue of queues) {
-  //       queue.status = 'pending'; // เปลี่ยนสถานะเป็น 'pending'
-  //       await queue.save(); // บันทึกการเปลี่ยนแปลง
-  //     }
-  //     return queues;
-  //   } catch (error) {
-  //     // หากเกิดข้อผิดพลาดในการดำเนินการกับฐานข้อมูล
-  //     console.error(
-  //       'Error occurred while setting all queues to pending:',
-  //       error,
-  //     );
-  //     throw error;
-  //   }
-  // }
-
   async updateQueueStatus(queueId: any): Promise<Queue | null> {
     try {
       // const queue = await this.queueModel.findOne({ patient: queueId });
@@ -212,31 +192,6 @@ export class QueueService {
     }
   }
 
-  // async updateQueueStatus(queueId: string): Promise<Queue | null> {
-  //   try {
-  //     // Find the queue to update
-  //     const queue = await this.queueModel
-  //       .findOne({ patient: queueId })
-  //       .populate('patient')
-  //       .exec();
-
-  //     if (!queue) {
-  //       throw new Error('Queue not found');
-  //     }
-
-  //     // Update the queue status
-  //     queue.status = 'isDiagnosing';
-
-  //     // Save the changes
-  //     const updatedQueue = await queue.save();
-
-  //     return updatedQueue;
-  //   } catch (error) {
-  //     // Handle errors
-  //     console.error('Error occurred while updating queue status:', error);
-  //     throw error;
-  //   }
-  // }
   async countQueuePerDay(): Promise<{ [key: string]: number }> {
     const queues = await this.queueModel.find();
     const countPerDay: { [key: string]: number } = {};
